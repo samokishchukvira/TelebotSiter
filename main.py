@@ -1180,9 +1180,9 @@ def restaurant_contacts_handler(message):
 def pool_aquazone_handler(message):
 
     media = [
-        InputMediaPhoto(open("pool-aquazone-1.JPG", "rb")),
-        InputMediaPhoto(open("pool-aquazone-2.JPG", "rb")),
-        InputMediaPhoto(open("pool-aquazone-3.JPG", "rb")),
+        InputMediaPhoto(open("pool-aquazone-1.jpg", "rb")),
+        InputMediaPhoto(open("pool-aquazone-2.jpg", "rb")),
+        InputMediaPhoto(open("pool-aquazone-3.jpg", "rb")),
     ]
     bot.send_media_group(message.chat.id, media)
 
