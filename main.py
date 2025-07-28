@@ -1450,7 +1450,15 @@ def kids_room_handler(message):
         with open(filename, "rb") as photo:
             bot.send_photo(message.chat.id, photo)
 
-    bot.send_message(message.chat.id, "[🧸Дитяча кімната](https://westhills.com.ua/services/children_room)", parse_mode="Markdown")
+    description = (
+        "✨*Дитяча кімната — це особливий, казковий простір, який ми з любов’ю створили для найменших відвідувачів Westhills.*\n\n"
+        "Це багатофункціональна зона, що поєднує в собі місце для ігор, творчості та фантазій, а також затишне середовище для відпочинку й розвитку дитини.\n\n"
+        "У певні дні тижня в нашій дитячій кімнаті працює аніматор, який дарує малюкам яскраві враження завдяки веселій програмі розваг.\n\n"
+        "Адже саме незабутні емоції — це найцінніший подарунок для дітей.🎨\n\n"
+        "[🧸Дитяча кімната](https://westhills.com.ua/services/children_room)"
+    )
+
+    bot.send_message(message.chat.id, description, parse_mode="Markdown")
 
 @bot.message_handler(func=lambda message: message.text == "Дитячий майданчик")
 def playground_handler(message):
@@ -1539,10 +1547,10 @@ def quantity_discount_handler(message):
 @bot.message_handler(func=lambda message: message.text == "Щасливий іменинник")
 def happy_noun_handler(message):
 
-    photo_files = ["hb.jpg"]
-    for filename in photo_files:
-        with open(filename, "rb") as photo:
-            bot.send_photo(message.chat.id, photo)
+    # photo_files = ["hb.jpg"]
+    # for filename in photo_files:
+    #     with open(filename, "rb") as photo:
+    #         bot.send_photo(message.chat.id, photo)
 
     bot.send_message(message.chat.id, "[🎂Щасливий іменинник](https://westhills.com.ua/special/shaslivij-imeninnik)", parse_mode="Markdown")
 
