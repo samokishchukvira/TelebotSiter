@@ -1552,11 +1552,11 @@ def happy_noun_handler(message):
 
 @bot.message_handler(func=lambda message: message.text == "Знижка УБД -15%")
 def discount_handler(message):
-    bot.send_message(message.chat.id, "[💙💛Знижка УБД -15%](https://westhills.com.ua/special/shaslivij-imeninnik)", parse_mode="Markdown")
+    bot.send_message(message.chat.id, "[💙💛Знижка УБД -15%](https://westhills.com.ua/special/ubd)", parse_mode="Markdown")
 
 @bot.message_handler(func=lambda message: message.text == "Подарунковий сертифікат")
 def gift_certificate_handler(message):
-    bot.send_message(message.chat.id, "[🎁Подарунковий сертифікат](https://westhills.com.ua/special/ubd)", parse_mode="Markdown")
+    bot.send_message(message.chat.id, "[🎁Подарунковий сертифікат](https://westhills.com.ua/special/podarunkovij-sertifikat)", parse_mode="Markdown")
 
 @bot.message_handler(func=lambda message: message.text == "Події")
 def offers_handler(message):
