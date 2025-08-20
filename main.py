@@ -1658,32 +1658,22 @@ TOKEN = "8454846230:AAENeqoRP8GCnIQo8S_keKykrIe0bB2JK1g"
 ADMIN_ID = 733841797
 bot = telebot.TeleBot(TOKEN)
 
-bot.set_my_commands([
-    types.BotCommand("start", "Запустити знову"),
-])
-
 complexes = [
-    "«Липські вежі» - Крихівці, вул. 22 січня",
     "«Кварлал Липки-2» - вул. Мазепи 168",
     "«Квартал Галицький» - вул. Хіміків 35, 37, 39",
     "«Квартал Галицький 2» - вул. Хіміків, 43",
-    "«Квартал Левада» - вул. Василя Стуса",
     "«Левада Дем’янів Лаз» - вул. Демʼянів Лаз 35, 37, 39",
     "«Квартал Галичанка» - вул. Галицька 59А",
     "«Квартал Гімназійний» - вул. Горбачевського 14Е",
-    "«Левада Затишна» – вул. Гетьмана Мазепи",
 ]
 
 address_files = {
-    "«Липські вежі»": "lipski_vezhi.txt",
     "«Кварлал Липки-2»": "kvartal_lipki_2.txt",
     "«Квартал Галицький»": "kvartal_galytskyi.txt",
     "«Квартал Галицький 2»": "kvartal_galytskyi_2.txt",
-    "«Квартал Левада»": "kvartal_levada.txt",
     "«Левада Дем’янів Лаз»": "levada_demianiv_laz.txt",
     "«Квартал Галичанка»": "kvartal_halychanka.txt",
     "«Квартал Гімназійний»": "kvartal_himnaziinyi.txt",
-    "«Левада Затишна»": "levada_zatyshna.txt",
 }
 
 user_data = {}
@@ -1696,7 +1686,7 @@ def send_complex_menu(chat_id):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     for c in complexes:
         markup.add(types.KeyboardButton(c))
-    bot.send_message(chat_id, "Виберіть свою адресу:", reply_markup=markup)
+    bot.send_message(chat_id, "🏢 Оберіть свій житловий комплекс", reply_markup=markup)
 
 def send_main_menu(chat_id):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -1706,225 +1696,254 @@ def send_main_menu(chat_id):
     markup.add("Обрати іншу адресу 🔙")
     bot.send_message(chat_id, "Оберіть опцію:", reply_markup=markup)
 
+
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
+    ensure_user(message.chat.id)
     send_complex_menu(message.chat.id)
+
 
 @bot.message_handler(func=lambda message: message.text in complexes)
 def choose_complex(message):
     ensure_user(message.chat.id)
+
     if " - " in message.text:
         name, address = message.text.split(" - ", 1)
-    elif " – " in message.text:
-        name, address = message.text.split(" – ", 1)
     else:
         name, address = message.text, ""
 
     user_data[message.chat.id]["complex"] = name.strip()
     user_data[message.chat.id]["address"] = address.strip()
 
-    text = f"🏠 Ваша адреса:\n*{name.strip()}\n{address.strip()}*"
-    bot.send_message(message.chat.id, text, parse_mode="Markdown")
+    bot.send_message(
+        message.chat.id,
+        f"🏠 Ваша адреса: *{name.strip()}\n{address.strip()}*",
+        parse_mode="Markdown"
+    )
 
-    send_main_menu(message.chat.id)
-
-@bot.message_handler(func=lambda message: message.text == "Мій рахунок")
-def request_pib(message):
-    ensure_user(message.chat.id)
-    user_data[message.chat.id]["context"] = "account"
     user_data[message.chat.id]["waiting_pib"] = True
-    bot.send_message(message.chat.id, "Будь ласка, введіть ваше ПІБ:", parse_mode="Markdown")
+    bot.send_message(message.chat.id, "👋Будь ласка, введіть ваше ПІБ:")
 
-@bot.message_handler(func=lambda message: message.text == "Залишити звернення")
-def request_pib_complaint(message):
-    ensure_user(message.chat.id)
-    user_data[message.chat.id]["context"] = "complaint"
-    user_data[message.chat.id]["waiting_pib"] = True
-    bot.send_message(message.chat.id, "Будь ласка, введіть ваше ПІБ для звернення:", parse_mode="Markdown")
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("waiting_pib", False))
 def get_pib(message):
     user_data[message.chat.id]["pib"] = message.text
     user_data[message.chat.id]["waiting_pib"] = False
+    user_data[message.chat.id]["waiting_exact_address"] = True
+
+    bot.send_message(message.chat.id, "🚪Вкажіть, будь ласка, вашу точну адресу, під'їзд та номер квартири:")
+
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("waiting_exact_address", False))
+def get_exact_address(message):
+    user_data[message.chat.id]["exact_address"] = message.text
+    user_data[message.chat.id]["waiting_exact_address"] = False
     user_data[message.chat.id]["waiting_phone"] = True
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     btn = types.KeyboardButton("📱 Поділитися номером", request_contact=True)
     markup.add(btn)
-    bot.send_message(message.chat.id, "Будь ласка, натисніть кнопку нижче, щоб поділитися своїм номером телефону:", reply_markup=markup)
+    bot.send_message(
+        message.chat.id,
+        "☎️ Будь ласка, натисніть кнопку нижче👇, щоб поділитися своїм номером телефону:",
+        reply_markup=markup
+    )
+
 
 @bot.message_handler(content_types=['contact'])
 def get_contact(message):
     if user_data.get(message.chat.id, {}).get("waiting_phone", False):
-        phone_number = message.contact.phone_number
-        user_data[message.chat.id]["phone"] = phone_number
+        user_data[message.chat.id]["phone"] = message.contact.phone_number
         user_data[message.chat.id]["waiting_phone"] = False
 
-        context = user_data[message.chat.id].get("context")
+        bot.send_message(
+            message.chat.id,
+            "✅ Дякуємо!\nВаші дані успішно збережено.\n\nТепер ви маєте доступ до головного меню бота 📲",
+            reply_markup=types.ReplyKeyboardRemove()
+        )
+        send_main_menu(message.chat.id)
 
-        if context == "account":
-            bot.send_message(
-                message.chat.id,
-                "✅ Дякуємо! Ваш запит прийнято.\nНайближчим часом ми надішлемо інформацію про ваш рахунок в особисті повідомлення.",
-                reply_markup=types.ReplyKeyboardRemove()
-            )
 
-            complex_name = user_data[message.chat.id].get("complex", "Не вибрано")
-            address = user_data[message.chat.id].get("address", "Не вибрано")
-            pib = user_data[message.chat.id].get("pib", "Не введено")
-            username = message.from_user.username or "Немає"
+@bot.message_handler(func=lambda message: message.text == "Мій рахунок")
+def show_account(message):
+    data = user_data.get(message.chat.id, {})
+    pib = data.get("pib", "Не введено")
+    exact_address = data.get("exact_address", "Не введено")
+    phone = data.get("phone", "Не введено")
 
-            admin_text = (
-                f"📥 *Запит на перегляд рахунку:*\n\n"
-                f"*ПІБ:* {pib}\n"
-                f"*ЖК:* {complex_name}\n"
-                f"*Адреса:* {address}\n"
-                f"*Telegram ID:* {message.chat.id}\n"
-                f"*Username:* @{username}\n"
-                f"*Телефон:* {phone_number}"
-            )
+    admin_text = (
+        f"📥 *Запит на перегляд рахунку:*\n\n"
+        f"*ПІБ:* {pib}\n"
+        f"*ЖК:* {data.get('complex','-')}\n"
+        f"*Адреса:* {data.get('address','-')}, {exact_address}\n"
+        f"*Телефон:* {phone}\n"
+        f"*Telegram ID:* {message.chat.id}\n"
+        f"*Username:* @{message.from_user.username or 'Немає'}"
+    )
+    bot.send_message(ADMIN_ID, admin_text, parse_mode="Markdown")
 
-            bot.send_message(ADMIN_ID, admin_text, parse_mode="Markdown")
-            send_main_menu(message.chat.id)
+    bot.send_message(
+        message.chat.id,
+        "✅ Ваш запит прийнято. Найближчим часом ми надішлемо інформацію про ваш рахунок.",
+    )
 
-        elif context == "complaint":
-            markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-            markup.add("📝 Описати звернення", "📸 Надіслати фото проблеми")
-            bot.send_message(message.chat.id, "Оберіть, будь ласка, як ви хочете залишити звернення:", reply_markup=markup)
-            user_data[message.chat.id]["waiting_complaint_action"] = True
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("waiting_complaint_action", False))
-def complaint_action_choice(message):
-    if message.text == "📝 Описати звернення":
-        user_data[message.chat.id]["waiting_complaint_action"] = False
-        user_data[message.chat.id]["waiting_complaint_text"] = True
-        bot.send_message(message.chat.id, "Будь ласка, опишіть вашу проблему:")
-    elif message.text == "📸 Надіслати фото проблеми":
-        user_data[message.chat.id]["waiting_complaint_action"] = False
-        user_data[message.chat.id]["waiting_complaint_photo"] = True
-        bot.send_message(message.chat.id, "Будь ласка, надішліть фото вашої проблеми:")
+@bot.message_handler(func=lambda message: message.text == "Залишити звернення")
+def leave_complaint(message):
+    user_data[message.chat.id]["waiting_complaint"] = True
+    bot.send_message(message.chat.id, "Будь ласка, опишіть вашу проблему:")
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("waiting_complaint_text", False))
-def complaint_text_received(message):
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("waiting_complaint", False))
+def complaint_text(message):
+    user_data[message.chat.id]["waiting_complaint"] = False
     text = message.text
-    user_data[message.chat.id]["waiting_complaint_text"] = False
 
-    pib = user_data[message.chat.id].get("pib", "Не введено")
-    complex_name = user_data[message.chat.id].get("complex", "Не вибрано")
-    address = user_data[message.chat.id].get("address", "Не вибрано")
-    phone = user_data[message.chat.id].get("phone", "Не введено")
-    username = message.from_user.username or "Немає"
+    data = user_data.get(message.chat.id, {})
+    pib = data.get("pib", "Не введено")
+    exact_address = data.get("exact_address", "Не введено")
+    phone = data.get("phone", "Не введено")
+
+    user_data[message.chat.id]["last_complaint_text"] = text
+    user_data[message.chat.id]["waiting_photo"] = True
+
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    markup.add("Так 📸", "Ні ❌")
+    bot.send_message(message.chat.id, "Бажаєте додати фото до звернення?", reply_markup=markup)
+
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("waiting_photo", False))
+def complaint_photo_choice(message):
+    user_data[message.chat.id]["waiting_photo"] = False
+    choice = message.text
+
+    if choice == "Так 📸":
+        user_data[message.chat.id]["waiting_photo_upload"] = True
+        bot.send_message(message.chat.id, "Будь ласка, надішліть фото:", reply_markup=types.ReplyKeyboardRemove())
+    else:
+        send_complaint_to_admin(message.chat.id)
+        bot.send_message(message.chat.id, "✅ Дякуємо за звернення! Ми з вами зв'яжемося найближчим часом.")
+        send_main_menu(message.chat.id)
+
+
+@bot.message_handler(content_types=['photo'])
+def complaint_photo_upload(message):
+    if user_data.get(message.chat.id, {}).get("waiting_photo_upload", False):
+        user_data[message.chat.id]["waiting_photo_upload"] = False
+        send_complaint_to_admin(message.chat.id, photo_id=message.photo[-1].file_id)
+        bot.send_message(message.chat.id, "✅ Дякуємо за звернення! Ми з вами зв'яжемося найближчим часом.")
+        send_main_menu(message.chat.id)
+
+
+def send_complaint_to_admin(chat_id, photo_id=None):
+    data = user_data.get(chat_id, {})
+    text = data.get("last_complaint_text", "-")
+    pib = data.get("pib", "Не введено")
+    exact_address = data.get("exact_address", "Не введено")
+    phone = data.get("phone", "Не введено")
 
     admin_text = (
         f"📥 *Звернення:*\n\n"
         f"*ПІБ:* {pib}\n"
-        f"*ЖК:* {complex_name}\n"
-        f"*Адреса:* {address}\n"
+        f"*ЖК:* {data.get('complex','-')}\n"
+        f"*Адреса:* {data.get('address','-')}, {exact_address}\n"
         f"*Телефон:* {phone}\n"
-        f"*Telegram ID:* {message.chat.id}\n"
-        f"*Username:* @{username}\n\n"
-        f"*Опис звернення:*\n{text}"
+        f"*Telegram ID:* {chat_id}\n"
+        f"*Username:* @{data.get('username','Немає')}\n\n"
+        f"*Опис проблеми:* {text}"
     )
-    bot.send_message(ADMIN_ID, admin_text, parse_mode="Markdown")
 
-    bot.send_message(message.chat.id, "✅ Дякуємо за звернення! Ми з вами зв'яжемося найближчим часом.", reply_markup=types.ReplyKeyboardRemove())
-    send_main_menu(message.chat.id)
+    if photo_id:
+        bot.send_photo(ADMIN_ID, photo_id, caption=admin_text, parse_mode="Markdown")
+    else:
+        bot.send_message(ADMIN_ID, admin_text, parse_mode="Markdown")
 
-@bot.message_handler(content_types=['photo'])
-def complaint_photo_received(message):
-    if user_data.get(message.chat.id, {}).get("waiting_complaint_photo", False):
-        user_data[message.chat.id]["waiting_complaint_photo"] = False
 
-        pib = user_data[message.chat.id].get("pib", "Не введено")
-        complex_name = user_data[message.chat.id].get("complex", "Не вибрано")
-        address = user_data[message.chat.id].get("address", "Не вибрано")
-        phone = user_data[message.chat.id].get("phone", "Не введено")
-        username = message.from_user.username or "Немає"
+@bot.message_handler(func=lambda message: message.text == "Актуальні оголошення")
+def announcements(message):
+    complex_name = user_data.get(message.chat.id, {}).get("complex")
+    if not complex_name:
+        bot.send_message(message.chat.id, "Спочатку оберіть адресу командою /start")
+        return
 
-        admin_text = (
-            f"📥 *Звернення:*\n\n"
-            f"*ПІБ:* {pib}\n"
-            f"*ЖК:* {complex_name}\n"
-            f"*Адреса:* {address}\n"
-            f"*Телефон:* {phone}\n"
-            f"*Telegram ID:* {message.chat.id}\n"
-            f"*Username:* @{username}\n"
-        )
+    base_name = complex_name.split(" - ")[0].strip()
+    file_name = address_files.get(base_name)
 
-        bot.send_photo(ADMIN_ID, message.photo[-1].file_id, caption=admin_text, parse_mode="Markdown")
+    if not file_name:
+        bot.send_message(message.chat.id, "📭 Оголошень для вашої адреси поки немає.\nСлідкуйте за оновленнями 😊")
+        return
 
-        bot.send_message(message.chat.id, "✅ Дякуємо за звернення! Ми з вами зв'яжемося найближчим часом.", reply_markup=types.ReplyKeyboardRemove())
-        send_main_menu(message.chat.id)
+    file_path = os.path.join("advertisement", file_name)
 
-@bot.message_handler(func=lambda message: message.text in [
-    "Актуальні оголошення",
-    "Мій рахунок",
-    "Залишити звернення",
-    "Загальнобудинковий борг",
-    "Наші контакти",
-    "Обрати іншу адресу 🔙"
-])
-
-def menu_handler(message):
-    if message.text == "Актуальні оголошення":
-        complex_name = user_data.get(message.chat.id, {}).get("complex")
-        if not complex_name:
-            bot.send_message(message.chat.id, "Спочатку оберіть адресу командою /start")
-            return
-
-        base_name = complex_name.split(" - ")[0].strip()
-        file_name = address_files.get(base_name)
-
-        if not file_name:
-            bot.send_message(message.chat.id, "Оголошень для вашої адреси поки немає.")
-            return
-
-        file_path = os.path.join("advertisement", file_name)
-
-        if os.path.exists(file_path):
-            with open(file_path, "r", encoding="utf-8") as f:
-                content = f.read().strip()
-            if content:
-                bot.send_message(message.chat.id, f"📢 *Актуальні оголошення:*\n\n{content}", parse_mode="Markdown")
-            else:
-                bot.send_message(message.chat.id, "Оголошень для вашої адреси поки немає.")
+    if os.path.exists(file_path):
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read().strip()
+        if content:
+            bot.send_message(message.chat.id, f"📢 *Актуальні оголошення:*\n\n{content}", parse_mode="Markdown")
         else:
-            bot.send_message(message.chat.id, "Оголошень для вашої адреси поки немає.")
-    elif message.text == "Мій рахунок":
-        bot.send_message(message.chat.id, "Тут можна буде подивитися баланс по вашій квартирі")
-    elif message.text == "Залишити звернення":
-        request_pib_complaint(message)
-    elif message.text == "Загальнобудинковий борг":
-        bot.send_message(message.chat.id, "Тут буде інформація про загальнобудинковий борг")
-    elif message.text == "Наші контакти":
-        contacts_text = (
-            "📍 *Адреса головного офісу:*\n"
-            "вул. Хіміків, 37\nм. Івано-Франківськ\n\n"
-            "——\n\n"
-            "📞 *Відділ продажу:*\n"
-            "+38 (068) 155 66 77\n"
-            "+38 (066) 300 01 00\n"
-            "+38 (097) 300 01 00\n\n"
-            "——\n\n"
-            "📑 *Відділ реєстрації документів:*\n"
-            "+38 (050) 021 93 98\n\n"
-            "——\n\n"
-            "🏢 *ЖЕО ПП \"Рідний дім\":*\n"
-            "Бухгалтерія: +38 (050) 197 24 85\n"
-            "Техвідділ: +38 (095) 681 30 40"
-        )
-        markup = types.InlineKeyboardMarkup()
-        markup.add(types.InlineKeyboardButton("📘 Facebook", url="https://www.facebook.com/%D0%9B%D0%B5%D0%B2%D0%B0%D0%B4%D0%B0-213141559222862/"))
-        markup.add(types.InlineKeyboardButton("📹 YouTube", url="https://www.youtube.com/channel/UCBxxdQ10jUh2EXib2ibcUKA?disable_polymer=true"))
-        markup.add(types.InlineKeyboardButton("📸 Instagram", url="https://www.instagram.com/levada.if?igsh=MWhqa2xwMHUzNGRkNw=="))
-        bot.send_message(message.chat.id, contacts_text, parse_mode="Markdown", reply_markup=markup)
-    elif message.text == "Обрати іншу адресу 🔙":
-        send_complex_menu(message.chat.id)
+            bot.send_message(message.chat.id, "📭 Оголошень для вашої адреси поки немає.\nСлідкуйте за оновленнями 😊")
+    else:
+        bot.send_message(message.chat.id, "📭 Оголошень для вашої адреси поки немає.\nСлідкуйте за оновленнями 😊")
 
-# print("Бот запущений...")
-# bot.polling(none_stop=True)
 
-if __name__ == "__main__":
-    bot.infinity_polling()
+@bot.message_handler(func=lambda message: message.text == "Загальнобудинковий борг")
+def house_debt(message):
+    complex_name = user_data.get(message.chat.id, {}).get("complex")
+    if not complex_name:
+        bot.send_message(message.chat.id, "Спочатку оберіть адресу командою /start")
+        return
 
+    base_name = complex_name.split(" - ")[0].strip()
+    file_name = address_files.get(base_name)
+
+    if not file_name:
+        bot.send_message(message.chat.id, "📭 Інформації про борг для вашої адреси поки немає.")
+        return
+
+    file_path = os.path.join("debt", file_name)
+
+    if os.path.exists(file_path):
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read().strip()
+        if content:
+            bot.send_message(message.chat.id, f"💰 *Загальнобудинковий борг:*\n\n{content}", parse_mode="Markdown")
+        else:
+            bot.send_message(message.chat.id, "📭 Інформації про борг для вашої адреси поки немає.")
+    else:
+        bot.send_message(message.chat.id, "📭 Інформації про борг для вашої адреси поки немає.")
+
+
+@bot.message_handler(func=lambda message: message.text == "Наші контакти")
+def contacts(message):
+    contacts_text = (
+        "📍 *Адреса головного офісу:*\n"
+        "вул. Хіміків, 37\nм. Івано-Франківськ\n\n"
+        "——\n\n"
+        "📞 *Відділ продажу:*\n"
+        "+38 (068) 155 66 77\n"
+        "+38 (066) 300 01 00\n"
+        "+38 (097) 300 01 00\n\n"
+        "——\n\n"
+        "📑 *Відділ реєстрації документів:*\n"
+        "+38 (050) 021 93 98\n\n"
+        "——\n\n"
+        "🏢 *ЖЕО ПП \"Рідний дім\":*\n"
+        "Бухгалтерія: +38 (050) 197 24 85\n"
+        "Техвідділ: +38 (095) 681 30 40"
+    )
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton("📘 Facebook", url="https://www.facebook.com/%D0%9B%D0%B5%D0%B2%D0%B0%D0%B4%D0%B0-213141559222862/"))
+    markup.add(types.InlineKeyboardButton("📹 YouTube", url="https://www.youtube.com/channel/UCBxxdQ10jUh2EXib2ibcUKA?disable_polymer=true"))
+    markup.add(types.InlineKeyboardButton("📸 Instagram", url="https://www.instagram.com/levada.if?igsh=MWhqa2xwMHUzNGRkNw=="))
+    bot.send_message(message.chat.id, contacts_text, parse_mode="Markdown", reply_markup=markup)
+
+
+@bot.message_handler(func=lambda message: message.text == "Обрати іншу адресу 🔙")
+def change_address(message):
+    send_complex_menu(message.chat.id)
+
+
+print("Бот запущений...")
+bot.delete_my_commands()
+bot.polling(none_stop=True)
 
