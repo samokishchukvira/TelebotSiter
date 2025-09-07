@@ -1655,7 +1655,7 @@ import telebot
 from telebot import types
 
 TOKEN = "8297975325:AAEKXiKd_iBubZ-_HtRAPNx4IVVOdTIu1_w"
-ADMIN_ID = [733841797, 8073693021]
+ADMIN_IDS = [733841797, 8073693021]
 bot = telebot.TeleBot(TOKEN)
 
 complexes = [
@@ -1780,7 +1780,8 @@ def show_account(message):
         f"*Telegram ID:* {message.chat.id}\n"
         f"*Username:* @{message.from_user.username or 'Немає'}"
     )
-    bot.send_message(ADMIN_ID, admin_text, parse_mode="Markdown")
+    for admin_id in ADMIN_IDS:
+      bot.send_message(admin_id, admin_text, parse_mode="Markdown")
 
     bot.send_message(
         message.chat.id,
@@ -1853,10 +1854,11 @@ def send_complaint_to_admin(chat_id, photo_id=None):
         f"*Опис проблеми:* {text}"
     )
 
-    if photo_id:
-        bot.send_photo(ADMIN_ID, photo_id, caption=admin_text, parse_mode="Markdown")
-    else:
-        bot.send_message(ADMIN_ID, admin_text, parse_mode="Markdown")
+    for admin_id in ADMIN_IDS:
+        if photo_id:
+            bot.send_photo(admin_id, photo_id, caption=admin_text, parse_mode="Markdown")
+        else:
+            bot.send_message(admin_id, admin_text, parse_mode="Markdown")
 
 
 @bot.message_handler(func=lambda message: message.text == "Актуальні оголошення")
@@ -1938,4 +1940,5 @@ def change_address(message):
 print("Бот запущений...")
 bot.delete_my_commands()
 bot.polling(none_stop=True)
+
 
