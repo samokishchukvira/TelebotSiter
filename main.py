@@ -1650,6 +1650,7 @@
 # def location_handler(message):
 #     bot.send_message(message.chat.id, "📍*Наша локація*\nhttps://maps.app.goo.gl/X9HPA7mzDCQm4zqT7", parse_mode="Markdown") 
 
+
 import os
 import telebot
 from telebot import types
@@ -1668,7 +1669,7 @@ complexes = [
 ]
 
 address_files = {
-    "«Кварлал Липки-2»": "kvartal_lipki_2.txt",
+    # "«Кварлал Липки-2»": "kvartal_lipki_2.txt",
     "«Квартал Галицький»": "kvartal_galytskyi.txt",
     "«Квартал Галицький 2»": "kvartal_galytskyi_2.txt",
     "«Левада Дем’янів Лаз»": "levada_demianiv_laz.txt",
@@ -1681,6 +1682,14 @@ user_data = {}
 def ensure_user(chat_id):
     if chat_id not in user_data:
         user_data[chat_id] = {}
+
+def input_validation(chat_id):
+    data = user_data.get(chat_id, {})
+    if not data.get("complex"):
+        send_complex_menu(chat_id)
+        return False
+    return True
+
 
 def send_complex_menu(chat_id):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -1718,11 +1727,12 @@ def choose_complex(message):
     bot.send_message(
         message.chat.id,
         f"🏠 Ваша адреса: *{name.strip()}\n{address.strip()}*",
-        parse_mode="Markdown"
+        parse_mode="Markdown",
+        reply_markup=types.ReplyKeyboardRemove()
     )
 
     user_data[message.chat.id]["waiting_pib"] = True
-    bot.send_message(message.chat.id, "👋Будь ласка, введіть ваше ПІБ:")
+    bot.send_message(message.chat.id, "👋 Будь ласка, введіть ваше ПІБ:")
 
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("waiting_pib", False))
@@ -1731,7 +1741,7 @@ def get_pib(message):
     user_data[message.chat.id]["waiting_pib"] = False
     user_data[message.chat.id]["waiting_exact_address"] = True
 
-    bot.send_message(message.chat.id, "🚪Вкажіть, будь ласка, вашу точну адресу та номер квартири:")
+    bot.send_message(message.chat.id, "🚪 Вкажіть, будь ласка, вашу точну адресу та номер квартири:")
 
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("waiting_exact_address", False))
@@ -1766,6 +1776,9 @@ def get_contact(message):
 
 @bot.message_handler(func=lambda message: message.text == "Мій рахунок")
 def show_account(message):
+    if not input_validation(message.chat.id):
+        return
+
     data = user_data.get(message.chat.id, {})
     pib = data.get("pib", "Не введено")
     exact_address = data.get("exact_address", "Не введено")
@@ -1797,6 +1810,9 @@ def leave_complaint(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("waiting_complaint", False))
 def complaint_text(message):
+    if not input_validation(message.chat.id):
+        return
+
     user_data[message.chat.id]["waiting_complaint"] = False
     text = message.text
 
@@ -1936,9 +1952,8 @@ def contacts(message):
 def change_address(message):
     send_complex_menu(message.chat.id)
 
+if __name__ == "__main__":
+    bot.infinity_polling()
 
-print("Бот запущений...")
-bot.delete_my_commands()
-bot.polling(none_stop=True)
 
 
