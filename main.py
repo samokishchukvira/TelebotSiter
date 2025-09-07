@@ -1881,7 +1881,7 @@ def send_complaint_to_admin(chat_id, photo_id=None):
 def announcements(message):
     complex_name = user_data.get(message.chat.id, {}).get("complex")
     if not complex_name:
-        bot.send_message(message.chat.id, "Спочатку оберіть адресу командою /start")
+        bot.send_message(message.chat.id, "Спочатку натисніть цю команду /start, щоб обрати адресу😊")
         return
 
     base_name = complex_name.split(" - ")[0].strip()
@@ -1908,7 +1908,7 @@ def announcements(message):
 def house_debt(message):
     complex_name = user_data.get(message.chat.id, {}).get("complex")
     if not complex_name:
-        bot.send_message(message.chat.id, "Спочатку оберіть адресу командою /start")
+        bot.send_message(message.chat.id, "Спочатку натисніть цю команду /start, щоб обрати адресу😊")
         return
 
     base_name = complex_name.split(" - ")[0].strip()
@@ -1954,6 +1954,7 @@ def change_address(message):
 
 if __name__ == "__main__":
     bot.infinity_polling()
+
 
 
 
