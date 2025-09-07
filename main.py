@@ -1655,7 +1655,7 @@ import telebot
 from telebot import types
 
 TOKEN = "8297975325:AAEKXiKd_iBubZ-_HtRAPNx4IVVOdTIu1_w"
-ADMIN_ID = 733841797
+ADMIN_ID = [733841797, 8073693021]
 bot = telebot.TeleBot(TOKEN)
 
 complexes = [
@@ -1938,3 +1938,4 @@ def change_address(message):
 print("Бот запущений...")
 bot.delete_my_commands()
 bot.polling(none_stop=True)
+
