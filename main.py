@@ -1651,13 +1651,15 @@
 #     bot.send_message(message.chat.id, "📍*Наша локація*\nhttps://maps.app.goo.gl/X9HPA7mzDCQm4zqT7", parse_mode="Markdown") 
 
 
+
+
 import os
 import telebot
 from telebot import types
 
-# TOKEN = "8297975325:AAEKXiKd_iBubZ-_HtRAPNx4IVVOdTIu1_w"
-# ADMIN_IDS = [733841797, 8073693021]
-# bot = telebot.TeleBot(TOKEN)
+TOKEN = "8297975325:AAEKXiKd_iBubZ-_HtRAPNx4IVVOdTIu1_w"
+ADMIN_IDS = [733841797, 8073693021, 527797499, 394592253]
+bot = telebot.TeleBot(TOKEN)
 
 complexes = [
     # "«Кварлал Липки-2» - вул. Мазепи 168",
@@ -1954,6 +1956,8 @@ def change_address(message):
 
 if __name__ == "__main__":
     bot.infinity_polling()
+
+
 
 
 
