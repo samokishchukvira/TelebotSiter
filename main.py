@@ -30,14 +30,6 @@ def ensure_user(chat_id):
     if chat_id not in user_data:
         user_data[chat_id] = {}
 
-def input_validation(chat_id):
-    data = user_data.get(chat_id, {})
-    if not data.get("complex"):
-        send_complex_menu(chat_id)
-        return False
-    return True
-
-
 def send_complex_menu(chat_id):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     for c in complexes:
@@ -297,6 +289,7 @@ def change_address(message):
 
 if __name__ == "__main__":
     bot.infinity_polling()
+
 
 
 
