@@ -1658,7 +1658,7 @@ import telebot
 from telebot import types
 
 TOKEN = "8297975325:AAEKXiKd_iBubZ-_HtRAPNx4IVVOdTIu1_w"
-ADMIN_IDS = [733841797, 394592253, 8073693021, 527797499, 771177410]
+ADMIN_IDS = [733841797, 6387359615, 394592253, 8073693021, 527797499, 771177410]
 bot = telebot.TeleBot(TOKEN)
 
 complexes = [
@@ -1956,6 +1956,7 @@ def change_address(message):
 
 if __name__ == "__main__":
     bot.infinity_polling()
+
 
 
 
