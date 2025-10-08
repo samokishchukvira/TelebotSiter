@@ -126,9 +126,6 @@ def get_contact(message):
 def show_account(message):
     # if not input_validation(message.chat.id):
     #     return
-    # if not input_validation(message.chat.id):
-    # bot.send_message(message.chat.id, "Спочатку оберіть свій житловий комплекс 🏢")
-    # return
 
     data = user_data.get(message.chat.id, {})
     pib = data.get("pib", "Не введено")
@@ -163,9 +160,6 @@ def leave_complaint(message):
 def complaint_text(message):
     # if not input_validation(message.chat.id):
     #     return
-    if not input_validation(message.chat.id):
-    bot.send_message(message.chat.id, "Спочатку оберіть свій житловий комплекс 🏢")
-    return
 
     user_data[message.chat.id]["waiting_complaint"] = False
     text = message.text
@@ -308,6 +302,7 @@ def change_address(message):
 
 if __name__ == "__main__":
     bot.infinity_polling()
+
 
 
 
