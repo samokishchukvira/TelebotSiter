@@ -126,9 +126,9 @@ def get_contact(message):
 def show_account(message):
     # if not input_validation(message.chat.id):
     #     return
-    if not input_validation(message.chat.id):
-    bot.send_message(message.chat.id, "Спочатку оберіть свій житловий комплекс 🏢")
-    return
+    # if not input_validation(message.chat.id):
+    # bot.send_message(message.chat.id, "Спочатку оберіть свій житловий комплекс 🏢")
+    # return
 
     data = user_data.get(message.chat.id, {})
     pib = data.get("pib", "Не введено")
@@ -308,6 +308,7 @@ def change_address(message):
 
 if __name__ == "__main__":
     bot.infinity_polling()
+
 
 
 
