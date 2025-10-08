@@ -356,7 +356,7 @@ def handle_text(message):
         complaint_text(message)
         return
 
-    send_main_menu(message.chat.id)
+    bot.send_message(message.chat.id, "Оберіть опцію з меню 👇")
 
 if __name__ == "__main__":
     while True:
@@ -365,6 +365,7 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Polling помилка: {e}")
             time.sleep(5)
+
 
 
 
