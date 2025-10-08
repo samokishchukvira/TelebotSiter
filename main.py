@@ -190,7 +190,17 @@ def leave_complaint(message):
 def complaint_text(message):
     # if not input_validation(message.chat.id):
     #     return
+if message.text in MENU_BUTTONS:
+    if message.text == "Обрати іншу адресу 🔙":
+        send_complex_menu(message.chat.id)
+        return
+    if message.text == "Наші контакти":
+        contacts(message)
+        return
 
+    bot.send_message(message.chat.id, "⚠️ Спочатку введіть інформацію 🏠")
+    return
+        
     user_data[message.chat.id]["waiting_complaint"] = False
     text = message.text
 
@@ -337,3 +347,4 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Polling помилка: {e}")
             time.sleep(5)
+
