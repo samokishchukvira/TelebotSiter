@@ -101,7 +101,7 @@ def get_pib(message):
             contacts(message)
             return
 
-        bot.send_message(message.chat.id, "⚠️ Спочатку введіть свої дані 🏠")
+        bot.send_message(message.chat.id, "Спочатку введіть свої дані😊")
         return
     
     user_data[message.chat.id]["pib"] = message.text
@@ -121,7 +121,7 @@ def get_exact_address(message):
             contacts(message)
             return
 
-        bot.send_message(message.chat.id, "⚠️ Спочатку введіть свої дані 🏠")
+        bot.send_message(message.chat.id, "Спочатку введіть свої дані😊")
         return
     
     user_data[message.chat.id]["exact_address"] = message.text
@@ -182,6 +182,9 @@ def show_account(message):
 
 @bot.message_handler(func=lambda message: message.text == "Залишити звернення")
 def leave_complaint(message):
+    if not user_data.get(message.chat.id, {}).get("complex"):
+        bot.send_message(message.chat.id, "⚠️ Спочатку натисніть /start та оберіть адресу 🏠")
+        return
     user_data[message.chat.id]["waiting_complaint"] = True
     bot.send_message(message.chat.id, "Будь ласка, опишіть вашу проблему:")
 
@@ -197,7 +200,7 @@ def complaint_text(message):
         if message.text == "Наші контакти":
             contacts(message)
             return
-        bot.send_message(message.chat.id, "⚠️ Спочатку введіть свої дані 🏠")
+        bot.send_message(message.chat.id, "Спочатку опишіть своє звернення 🏠")
         return
         
     user_data[message.chat.id]["waiting_complaint"] = False
@@ -278,7 +281,7 @@ def announcements(message):
         bot.send_message(message.chat.id, "📭 Оголошень для вашої адреси поки немає.\nСлідкуйте за оновленнями 😊")
         return
 
-    file_path = os.path.join("advertisement", file_name)
+    file_path = os.path.join("advertisement", file_name) 
 
     if os.path.exists(file_path):
         with open(file_path, "r", encoding="utf-8") as f:
@@ -346,4 +349,5 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Polling помилка: {e}")
             time.sleep(5)
+
 
