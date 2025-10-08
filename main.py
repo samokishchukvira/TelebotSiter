@@ -1,10 +1,11 @@
 import os
+import time
 import telebot
 from telebot import types
 
 TOKEN = "8297975325:AAGArbLcJE9dSsMxoZmIzxx41wjBbKwg54I"
-ADMIN_IDS = [733841797, 394592253, 1336042507, 6334390799, 527797499, 771177410]
-
+ADMIN_IDS = [733841797]
+# , 394592253, 1336042507, 6334390799, 527797499, 771177410
 bot = telebot.TeleBot(TOKEN)
 
 complexes = [
@@ -76,15 +77,33 @@ def choose_complex(message):
         message.chat.id,
         f"🏠 Ваша адреса: *{name.strip()}\n{address.strip()}*",
         parse_mode="Markdown",
-        reply_markup=types.ReplyKeyboardRemove()
+        # reply_markup=types.ReplyKeyboardRemove()
     )
 
     user_data[message.chat.id]["waiting_pib"] = True
     bot.send_message(message.chat.id, "👋 Будь ласка, введіть ваше ПІБ:")
 
+MENU_BUTTONS = [
+    "Актуальні оголошення", "Мій рахунок",
+    "Залишити звернення", "Загальнобудинковий борг",
+    "Наші контакти", "Обрати іншу адресу 🔙"
+]
+
+IGNORE_BUTTONS_DURING_INPUT = ["Обрати іншу адресу 🔙", "Наші контакти"]
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("waiting_pib", False))
-def get_pib(message):
+def get_pib(message): 
+    if message.text in MENU_BUTTONS:
+        if message.text == "Обрати іншу адресу 🔙":
+            send_complex_menu(message.chat.id)
+            return
+        if message.text == "Наші контакти":
+            contacts(message)
+            return
+
+        bot.send_message(message.chat.id, "⚠️ Спочатку введіть свої дані 🏠")
+        return
+    
     user_data[message.chat.id]["pib"] = message.text
     user_data[message.chat.id]["waiting_pib"] = False
     user_data[message.chat.id]["waiting_exact_address"] = True
@@ -94,6 +113,17 @@ def get_pib(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("waiting_exact_address", False))
 def get_exact_address(message):
+    if message.text in MENU_BUTTONS:
+        if message.text == "Обрати іншу адресу 🔙":
+            send_complex_menu(message.chat.id)
+            return
+        if message.text == "Наші контакти":
+            contacts(message)
+            return
+
+        bot.send_message(message.chat.id, "⚠️ Спочатку введіть свої дані 🏠")
+        return
+    
     user_data[message.chat.id]["exact_address"] = message.text
     user_data[message.chat.id]["waiting_exact_address"] = False
     user_data[message.chat.id]["waiting_phone"] = True
@@ -117,7 +147,7 @@ def get_contact(message):
         bot.send_message(
             message.chat.id,
             "✅ Дякуємо!\nВаші дані успішно збережено.\n\nТепер ви маєте доступ до головного меню бота 📲",
-            reply_markup=types.ReplyKeyboardRemove()
+            # reply_markup=types.ReplyKeyboardRemove()
         )
         send_main_menu(message.chat.id)
 
@@ -301,24 +331,11 @@ def change_address(message):
     send_complex_menu(message.chat.id)
 
 if __name__ == "__main__":
-    bot.infinity_polling()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+while True:
+    try:
+        bot.infinity_polling(timeout=60, long_polling_timeout=5)
+    except Exception as e:
+        print(f"Polling помилка: {e}")
+        time.sleep(5)
+# if __name__ == "__main__":
+#     bot.infinity_polling()
