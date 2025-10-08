@@ -331,11 +331,9 @@ def change_address(message):
     send_complex_menu(message.chat.id)
 
 if __name__ == "__main__":
-while True:
-    try:
-        bot.infinity_polling(timeout=60, long_polling_timeout=5)
-    except Exception as e:
-        print(f"Polling помилка: {e}")
-        time.sleep(5)
-# if __name__ == "__main__":
-#     bot.infinity_polling()
+    while True:
+        try:
+            bot.infinity_polling(timeout=60, long_polling_timeout=5)
+        except Exception as e:
+            print(f"Polling помилка: {e}")
+            time.sleep(5)
