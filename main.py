@@ -342,6 +342,21 @@ def contacts(message):
 def change_address(message):
     send_complex_menu(message.chat.id)
 
+@bot.message_handler(func=lambda message: True)
+def handle_text(message):
+    data = user_data.get(message.chat.id, {})
+
+    if data.get("waiting_pib", False):
+        get_pib(message)
+        return
+    if data.get("waiting_exact_address", False):
+        get_exact_address(message)
+        return
+    if data.get("waiting_complaint", False):
+        complaint_text(message)
+        return
+    bot.send_message(message.chat.id, "Оберіть опцію з меню 👇")
+
 if __name__ == "__main__":
     while True:
         try:
@@ -349,5 +364,6 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Polling помилка: {e}")
             time.sleep(5)
+
 
 
