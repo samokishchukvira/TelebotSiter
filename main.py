@@ -235,33 +235,46 @@ def complaint_text(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("waiting_photo", False))
 def complaint_photo_choice(message):
-    user_data[message.chat.id]["waiting_photo"] = False
+    chat_id = message.chat.id
+    data = user_data.get(chat_id, {})
+
+    # Зупиняємо очікування фото
+    user_data[chat_id]["waiting_photo"] = False
+
     choice = message.text.strip()
 
     if choice == "Так 📸":
-        user_data[message.chat.id]["waiting_photo_upload"] = True
+        user_data[chat_id]["waiting_photo_upload"] = True
         bot.send_message(
-            message.chat.id,
+            chat_id,
             "Будь ласка, надішліть фото:",
             reply_markup=types.ReplyKeyboardRemove()
         )
+        return
+
     elif choice == "Ні ❌":
-        send_complaint_to_admin(message.chat.id)
+        send_complaint_to_admin(chat_id)
         bot.send_message(
-            message.chat.id,
+            chat_id,
             "✅ Дякуємо за звернення! Ми з вами зв'яжемося найближчим часом.",
             reply_markup=types.ReplyKeyboardRemove()
         )
-        send_main_menu(message.chat.id)
+        send_main_menu(chat_id)
         return
-    else:
-        bot.send_message(
-            message.chat.id,
-            "Будь ласка, оберіть варіант із кнопок нижче 👇",
-        )
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-        markup.add("Так 📸", "Ні ❌")
-        bot.send_message(message.chat.id, "Бажаєте додати фото до звернення?", reply_markup=markup)
+
+    # Якщо користувач ввів щось інше:
+    bot.send_message(
+        chat_id,
+        "⚠️ Будь ласка, оберіть один із варіантів нижче 👇"
+    )
+
+    # Повертаємо клавіатуру ще раз, але без зациклення
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    markup.add("Так 📸", "Ні ❌")
+    bot.send_message(chat_id, "Бажаєте додати фото до звернення?", reply_markup=markup)
+
+    # Знову ставимо очікування вибору, щоб користувач міг відповісти ще раз
+    user_data[chat_id]["waiting_photo"] = True
 
 @bot.message_handler(content_types=['photo'])
 def complaint_photo_upload(message):
@@ -395,6 +408,7 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Polling помилка: {e}")
             time.sleep(5)
+
 
 
 
