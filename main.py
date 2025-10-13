@@ -184,7 +184,7 @@ def show_account(message):
 @bot.message_handler(func=lambda message: message.text == "Залишити звернення")
 def leave_complaint(message):
     if not user_data.get(message.chat.id, {}).get("complex"):
-        bot.send_message(message.chat.id, "⚠️ Спочатку натисніть /start та оберіть адресу 🏠")
+        bot.send_message(message.chat.id, "Спочатку натисніть /start та оберіть адресу 🏠")
         return
     user_data[message.chat.id]["waiting_complaint"] = True
     bot.send_message(message.chat.id, "Будь ласка, опишіть вашу проблему:")
@@ -221,18 +221,43 @@ def complaint_text(message):
 
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("waiting_photo", False))
+# def complaint_photo_choice(message):
+#     user_data[message.chat.id]["waiting_photo"] = False
+#     choice = message.text
+
+#     if choice == "Так 📸":
+#         user_data[message.chat.id]["waiting_photo_upload"] = True
+#         bot.send_message(message.chat.id, "Будь ласка, надішліть фото:", reply_markup=types.ReplyKeyboardRemove())
+#     else:
+#         send_complaint_to_admin(message.chat.id)
+#         bot.send_message(message.chat.id, "✅ Дякуємо за звернення! Ми з вами зв'яжемося найближчим часом.")
+#         send_main_menu(message.chat.id)
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("waiting_photo", False))
 def complaint_photo_choice(message):
     user_data[message.chat.id]["waiting_photo"] = False
-    choice = message.text
+    choice = message.text.strip()
+
+    if choice == "Ні ❌":
+        send_complaint_to_admin(message.chat.id)
+        bot.send_message(
+            message.chat.id,
+            "✅ Дякуємо за звернення! Ми з вами зв'яжемося найближчим часом.",
+            reply_markup=types.ReplyKeyboardRemove()
+        )
+        send_main_menu(message.chat.id)
+        return
 
     if choice == "Так 📸":
         user_data[message.chat.id]["waiting_photo_upload"] = True
-        bot.send_message(message.chat.id, "Будь ласка, надішліть фото:", reply_markup=types.ReplyKeyboardRemove())
-    else:
-        send_complaint_to_admin(message.chat.id)
-        bot.send_message(message.chat.id, "✅ Дякуємо за звернення! Ми з вами зв'яжемося найближчим часом.")
-        send_main_menu(message.chat.id)
+        bot.send_message(
+            message.chat.id,
+            "Будь ласка, надішліть фото:",
+            reply_markup=types.ReplyKeyboardRemove()
+        )
+        return
 
+    bot.send_message(message.chat.id, "Будь ласка, оберіть одну з опцій: «Так 📸» або «Ні ❌».")
 
 @bot.message_handler(content_types=['photo'])
 def complaint_photo_upload(message):
@@ -366,6 +391,7 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Polling помилка: {e}")
             time.sleep(5)
+
 
 
 
