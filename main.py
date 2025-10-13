@@ -220,7 +220,7 @@ def complaint_text(message):
     bot.send_message(message.chat.id, "Бажаєте додати фото до звернення?", reply_markup=markup)
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("waiting_photo", False))
+# @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("waiting_photo", False))
 # def complaint_photo_choice(message):
 #     user_data[message.chat.id]["waiting_photo"] = False
 #     choice = message.text
@@ -395,6 +395,7 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Polling помилка: {e}")
             time.sleep(5)
+
 
 
 
