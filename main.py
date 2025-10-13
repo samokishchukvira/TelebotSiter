@@ -238,7 +238,6 @@ def complaint_photo_choice(message):
     chat_id = message.chat.id
     data = user_data.get(chat_id, {})
 
-    # Зупиняємо очікування фото
     user_data[chat_id]["waiting_photo"] = False
 
     choice = message.text.strip()
@@ -262,18 +261,15 @@ def complaint_photo_choice(message):
         send_main_menu(chat_id)
         return
 
-    # Якщо користувач ввів щось інше:
     bot.send_message(
         chat_id,
-        "⚠️ Будь ласка, оберіть один із варіантів нижче 👇"
+        "Будь ласка, оберіть один із варіантів нижче 👇"
     )
 
-    # Повертаємо клавіатуру ще раз, але без зациклення
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     markup.add("Так 📸", "Ні ❌")
     bot.send_message(chat_id, "Бажаєте додати фото до звернення?", reply_markup=markup)
 
-    # Знову ставимо очікування вибору, щоб користувач міг відповісти ще раз
     user_data[chat_id]["waiting_photo"] = True
 
 @bot.message_handler(content_types=['photo'])
@@ -408,6 +404,7 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Polling помилка: {e}")
             time.sleep(5)
+
 
 
 
