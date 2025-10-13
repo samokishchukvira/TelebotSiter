@@ -238,7 +238,14 @@ def complaint_photo_choice(message):
     user_data[message.chat.id]["waiting_photo"] = False
     choice = message.text.strip()
 
-    if choice == "Ні ❌":
+    if choice == "Так 📸":
+        user_data[message.chat.id]["waiting_photo_upload"] = True
+        bot.send_message(
+            message.chat.id,
+            "Будь ласка, надішліть фото:",
+            reply_markup=types.ReplyKeyboardRemove()
+        )
+    elif choice == "Ні ❌":
         send_complaint_to_admin(message.chat.id)
         bot.send_message(
             message.chat.id,
@@ -247,17 +254,14 @@ def complaint_photo_choice(message):
         )
         send_main_menu(message.chat.id)
         return
-
-    if choice == "Так 📸":
-        user_data[message.chat.id]["waiting_photo_upload"] = True
+    else:
         bot.send_message(
             message.chat.id,
-            "Будь ласка, надішліть фото:",
-            reply_markup=types.ReplyKeyboardRemove()
+            "Будь ласка, оберіть варіант із кнопок нижче 👇",
         )
-        return
-
-    bot.send_message(message.chat.id, "Будь ласка, оберіть одну з опцій: «Так 📸» або «Ні ❌».")
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+        markup.add("Так 📸", "Ні ❌")
+        bot.send_message(message.chat.id, "Бажаєте додати фото до звернення?", reply_markup=markup)
 
 @bot.message_handler(content_types=['photo'])
 def complaint_photo_upload(message):
@@ -391,6 +395,7 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Polling помилка: {e}")
             time.sleep(5)
+
 
 
 
