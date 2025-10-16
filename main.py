@@ -369,13 +369,14 @@ def contacts(message):
         "вул. Хіміків, 37\nм. Івано-Франківськ\n\n"
         "——\n\n"
         "🏢 *ЖЕО ПП \"Рідний дім\":*\n"
-        "Бухгалтерія: +38 (050) 197 24 85\n"
-        "Техвідділ: +38 (095) 681 30 40"
+        "Бухгалтерія: +38 (066) 368 33 26\n"
+        "+38 (050) 197 24 85\n"
+        "Техвідділ: +38 (067) 128 37 38"
     )
     markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("📘 Facebook", url="https://www.facebook.com/%D0%9B%D0%B5%D0%B2%D0%B0%D0%B4%D0%B0-213141559222862/"))
-    markup.add(types.InlineKeyboardButton("📹 YouTube", url="https://www.youtube.com/channel/UCBxxdQ10jUh2EXib2ibcUKA?disable_polymer=true"))
-    markup.add(types.InlineKeyboardButton("📸 Instagram", url="https://www.instagram.com/levada.if?igsh=MWhqa2xwMHUzNGRkNw=="))
+    # markup.add(types.InlineKeyboardButton("📘 Facebook", url="https://www.facebook.com/%D0%9B%D0%B5%D0%B2%D0%B0%D0%B4%D0%B0-213141559222862/"))
+    # markup.add(types.InlineKeyboardButton("📹 YouTube", url="https://www.youtube.com/channel/UCBxxdQ10jUh2EXib2ibcUKA?disable_polymer=true"))
+    # markup.add(types.InlineKeyboardButton("📸 Instagram", url="https://www.instagram.com/levada.if?igsh=MWhqa2xwMHUzNGRkNw=="))
     bot.send_message(message.chat.id, contacts_text, parse_mode="Markdown", reply_markup=markup)
 
 
@@ -406,6 +407,7 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Polling помилка: {e}")
             time.sleep(5)
+
 
 
 
