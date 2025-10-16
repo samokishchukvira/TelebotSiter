@@ -29,7 +29,7 @@ address_files = {
     "«Квартал Гімназійний-2»": "kvartal_himnaziinyi_2.txt",
 }
 
-debt_files = {
+dept_files = {
     "«Квартал Левада»": "kvartal_levada_debt.txt",
     "«Квартал Гімназійний-1»": "kvartal_himnaziinyi_1_debt.txt",
     "«Квартал Галицький»": "kvartal_galytskyi_debt.txt",
@@ -353,13 +353,13 @@ def house_debt(message):
         return
 
     base_name = complex_name.split(" - ")[0].strip()
-    file_name = debt_files.get(base_name)
+    file_name = dept_files.get(base_name)
 
     if not file_name:
         bot.send_message(message.chat.id, "📭 Інформації про борг для вашої адреси поки немає.")
         return
 
-    file_path = os.path.join("debt", file_name)
+    file_path = os.path.join("dept", file_name)
 
     if os.path.exists(file_path):
         with open(file_path, "r", encoding="utf-8") as f:
@@ -417,6 +417,7 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Polling помилка: {e}")
             time.sleep(5)
+
 
 
 
