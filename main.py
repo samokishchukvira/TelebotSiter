@@ -29,6 +29,16 @@ address_files = {
     "«Квартал Гімназійний-2»": "kvartal_himnaziinyi_2.txt",
 }
 
+debt_files = {
+    "«Квартал Левада»": "kvartal_levada_debt.txt",
+    "«Квартал Гімназійний-1»": "kvartal_himnaziinyi_1_debt.txt",
+    "«Квартал Галицький»": "kvartal_galytskyi_debt.txt",
+    "«Квартал Галицький 2»": "kvartal_galytskyi_2_debt.txt",
+    "«Левада Дем’янів Лаз»": "levada_demianiv_laz_debt.txt",
+    "«Квартал Галичанка»": "kvartal_halychanka_debt.txt",
+    "«Квартал Гімназійний-2»": "kvartal_himnaziinyi_2_debt.txt",
+}
+
 user_data = {}
 
 def ensure_user(chat_id):
@@ -343,7 +353,7 @@ def house_debt(message):
         return
 
     base_name = complex_name.split(" - ")[0].strip()
-    file_name = address_files.get(base_name)
+    file_name = debt_files.get(base_name)
 
     if not file_name:
         bot.send_message(message.chat.id, "📭 Інформації про борг для вашої адреси поки немає.")
@@ -407,6 +417,7 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Polling помилка: {e}")
             time.sleep(5)
+
 
 
 
