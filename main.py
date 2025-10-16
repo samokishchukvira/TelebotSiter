@@ -21,12 +21,13 @@ complexes = [
 ]
 
 address_files = {
-    # "«Кварлал Липки-2»": "kvartal_lipki_2.txt",
+    "«Квартал Левада»": "kvartal_levada.txt",
+    "«Квартал Гімназійний-1»": "kvartal_himnaziinyi_1.txt",
     "«Квартал Галицький»": "kvartal_galytskyi.txt",
     "«Квартал Галицький 2»": "kvartal_galytskyi_2.txt",
     "«Левада Дем’янів Лаз»": "levada_demianiv_laz.txt",
     "«Квартал Галичанка»": "kvartal_halychanka.txt",
-    "«Квартал Гімназійний»": "kvartal_himnaziinyi.txt",
+    "«Квартал Гімназійний-2»": "kvartal_himnaziinyi_2.txt",
 }
 
 user_data = {}
@@ -407,6 +408,7 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Polling помилка: {e}")
             time.sleep(5)
+
 
 
 
