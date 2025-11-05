@@ -4,7 +4,7 @@ import telebot
 from telebot import types
 
 TOKEN = "8297975325:AAGArbLcJE9dSsMxoZmIzxx41wjBbKwg54I"
-ADMIN_IDS = [733841797, 751177410, 1336042507, 394592253, 527797499, 6334390799]
+ADMIN_IDS = [733841797, 1336042507, 751177410, 394592253, 527797499, 6334390799]
 # 394592253, 1336042507, 6334390799, 527797499, 771177410
 # 6334390799, 1336042507, 527797499, 771177410, 394592253, 733841797
 bot = telebot.TeleBot(TOKEN)
@@ -417,6 +417,7 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Polling помилка: {e}")
             time.sleep(5)
+
 
 
 
