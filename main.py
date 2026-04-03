@@ -2,6 +2,7 @@ import os
 import time
 import telebot
 from telebot import types
+import traceback
 
 TOKEN = "8297975325:AAGArbLcJE9dSsMxoZmIzxx41wjBbKwg54I"
 ADMIN_IDS = [733841797, 506004747, 1336042507, 751177410, 394592253, 527797499, 6334390799]
@@ -413,10 +414,13 @@ def handle_text(message):
 if __name__ == "__main__":
     while True:
         try:
+            print("Бот запущений...")
             bot.infinity_polling(timeout=60, long_polling_timeout=5)
         except Exception as e:
-            print(f"Polling помилка: {e}")
+            print("ПОМИЛКА:", e)
+            traceback.print_exc()
             time.sleep(5)
+
 
 
 
