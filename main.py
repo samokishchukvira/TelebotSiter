@@ -414,7 +414,7 @@ def handle_text(message):
 if __name__ == "__main__":
     while True:
         try:
-            print("Бот запущений...")
+            print("Бот запущений")
             bot.infinity_polling(timeout=60, long_polling_timeout=5)
         except Exception as e:
             print("ПОМИЛКА:", e)
